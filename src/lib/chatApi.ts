@@ -1,5 +1,8 @@
 import type { ChatMessage } from '@/types/chat'
 
+// Get API base URL from environment or use relative path (for dev)
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || ''
+
 export async function sendChatMessage(
   userMessage: string,
   history: ChatMessage[]
@@ -9,7 +12,9 @@ export async function sendChatMessage(
     content: m.content,
   }))
 
-  const res = await fetch('/api/chat', {
+  const endpoint = `${API_BASE_URL}/api/chat`
+
+  const res = await fetch(endpoint, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ message: userMessage, history: apiHistory }),

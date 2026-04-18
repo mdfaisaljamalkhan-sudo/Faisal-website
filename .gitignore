@@ -13,9 +13,11 @@ dist-ssr
 *.local
 
 # Backend
+.env
 backend/.env
 backend/venv
 backend/__pycache__
+backend/chroma_data/
 
 # Editor directories and files
 .vscode/*

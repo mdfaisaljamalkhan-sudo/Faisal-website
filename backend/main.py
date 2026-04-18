@@ -4,18 +4,37 @@ from pydantic import BaseModel
 import os
 from dotenv import load_dotenv
 from anthropic import Anthropic
-from rag import retrieve_context, build_rag_prompt
+from rag import retrieve_context, build_rag_prompt, initialize_rag
 
 load_dotenv()
 
 app = FastAPI()
 
+# Get allowed origins from environment or use defaults for dev
+frontend_origin = os.environ.get("FRONTEND_ORIGIN", "http://localhost:5173")
+allow_origins = [
+    "http://127.0.0.1:5173",
+    "http://localhost:5173",
+    frontend_origin,
+]
+# Remove duplicates
+allow_origins = list(set(allow_origins))
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://127.0.0.1:5173", "http://localhost:5173"],
-    allow_methods=["POST"],
+    allow_origins=allow_origins,
+    allow_methods=["POST", "GET"],
     allow_headers=["*"],
 )
+
+# Startup event to initialize RAG
+@app.on_event("startup")
+async def startup_event():
+    try:
+        initialize_rag()
+        print("✓ RAG system initialized at startup")
+    except Exception as e:
+        print(f"⚠ Warning: RAG initialization failed: {e}")
 
 # Initialize Anthropic client
 client = Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))

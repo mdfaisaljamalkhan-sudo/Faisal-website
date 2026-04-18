@@ -3,9 +3,13 @@ from pathlib import Path
 import chromadb
 from sentence_transformers import SentenceTransformer
 from knowledge import FAISAL_KNOWLEDGE
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Initialize Chroma client (local, persistent)
-chroma_client = chromadb.PersistentClient(path="./chroma_data")
+chroma_data_dir = os.environ.get("CHROMA_DATA_DIR", "./chroma_data")
+chroma_client = chromadb.PersistentClient(path=chroma_data_dir)
 
 # Initialize embedding model (lightweight)
 embedder = SentenceTransformer('all-MiniLM-L6-v2')
