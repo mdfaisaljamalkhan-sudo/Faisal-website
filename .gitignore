@@ -19,6 +19,9 @@ backend/venv
 backend/__pycache__
 backend/chroma_data/
 
+# Build artifacts
+tsconfig.app.tsbuildinfo
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

@@ -1,6 +1,5 @@
 import type { ChatMessage } from '@/types/chat'
 
-// Backend URL: HF Spaces in production, relative path for local dev
 const API_BASE_URL = import.meta.env.DEV
   ? ''
   : 'https://Anal-ist-Faisal-website-backend.hf.space'
@@ -14,19 +13,30 @@ export async function sendChatMessage(
     content: m.content,
   }))
 
-  const endpoint = `${API_BASE_URL}/api/chat`
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(), 30_000)
 
-  const res = await fetch(endpoint, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ message: userMessage, history: apiHistory }),
-  })
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: userMessage, history: apiHistory }),
+      signal: controller.signal,
+    })
 
-  if (!res.ok) {
-    const error = await res.json().catch(() => ({}))
-    throw new Error(error.detail || 'Failed to get a response. Please try again.')
+    if (!res.ok) {
+      const error = await res.json().catch(() => ({}))
+      throw new Error(error.detail || 'Failed to get a response. Please try again.')
+    }
+
+    const data = await res.json()
+    return data.reply
+  } catch (err) {
+    if (err instanceof DOMException && err.name === 'AbortError') {
+      throw new Error('Request timed out. Please try again.')
+    }
+    throw err
+  } finally {
+    clearTimeout(timeout)
   }
-
-  const data = await res.json()
-  return data.reply
 }

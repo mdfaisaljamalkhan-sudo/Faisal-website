@@ -1,42 +1,39 @@
+import os
+import traceback
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-import os
 from dotenv import load_dotenv
 from anthropic import Anthropic
+
 from rag import retrieve_context, build_rag_prompt, initialize_rag
 
 load_dotenv()
 
-app = FastAPI()
 
-# Get allowed origins from environment or use defaults for dev
-frontend_origin = os.environ.get("FRONTEND_ORIGIN", "http://localhost:5173")
-allow_origins = [
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    initialize_rag()
+    yield
+
+
+app = FastAPI(lifespan=lifespan)
+
+ALLOWED_ORIGINS = [
     "http://127.0.0.1:5173",
     "http://localhost:5173",
-    frontend_origin,
+    "https://faisal-website.mdfaisaljamalkhan.workers.dev",
 ]
-# Remove duplicates
-allow_origins = list(set(allow_origins))
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=allow_origins,
+    allow_origins=ALLOWED_ORIGINS,
     allow_methods=["POST", "GET"],
     allow_headers=["*"],
 )
 
-# Startup event to initialize RAG
-@app.on_event("startup")
-async def startup_event():
-    try:
-        initialize_rag()
-        print("✓ RAG system initialized at startup")
-    except Exception as e:
-        print(f"⚠ Warning: RAG initialization failed: {e}")
-
-# Initialize Anthropic client
 client = Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
 
 SYSTEM_PROMPT = """You are Faisal's AI assistant, representing him authentically to recruiters and visitors.
@@ -85,16 +82,9 @@ async def chat(req: ChatRequest):
     if not req.message.strip():
         raise HTTPException(status_code=400, detail="Message cannot be empty")
 
-    # Retrieve relevant context using RAG
     context = retrieve_context(req.message, top_k=3)
-
-    # Build message with context
     user_message_with_context = build_rag_prompt(req.message, context)
-
-    # Limit history to last 10 turns
     trimmed_history = req.history[-10:]
-
-    # Build messages array with context (Claude format)
     messages = trimmed_history + [{"role": "user", "content": user_message_with_context}]
 
     try:
@@ -106,7 +96,5 @@ async def chat(req: ChatRequest):
         )
         return {"reply": response.content[0].text}
     except Exception as e:
-        import traceback
-        error_msg = f"{type(e).__name__}: {str(e)}\n{traceback.format_exc()}"
-        print(f"ERROR: {error_msg}")  # Print to console
-        raise HTTPException(status_code=500, detail=error_msg)
+        print(f"ERROR: {type(e).__name__}: {e}\n{traceback.format_exc()}")
+        raise HTTPException(status_code=500, detail="Something went wrong. Please try again.")
