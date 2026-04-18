@@ -1,7 +1,9 @@
 import type { ChatMessage } from '@/types/chat'
 
-// Get API base URL from environment or use relative path (for dev)
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || ''
+// Backend URL: HF Spaces in production, relative path for local dev
+const API_BASE_URL = import.meta.env.DEV
+  ? ''
+  : 'https://Anal-ist-Faisal-website-backend.hf.space'
 
 export async function sendChatMessage(
   userMessage: string,
