@@ -62,7 +62,7 @@ def initialize_rag():
         collection = chroma_client.get_collection(name="faisal_knowledge")
         print(f"✓ RAG database loaded ({collection.count()} chunks)")
         return
-    except ValueError:
+    except Exception:
         pass
 
     print("Initializing RAG database...")
