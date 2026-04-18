@@ -14,7 +14,7 @@ export async function sendChatMessage(
   }))
 
   const controller = new AbortController()
-  const timeout = setTimeout(() => controller.abort(), 30_000)
+  const timeout = setTimeout(() => controller.abort(), 60_000)
 
   try {
     const res = await fetch(`${API_BASE_URL}/api/chat`, {
