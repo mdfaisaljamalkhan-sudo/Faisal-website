@@ -1,6 +1,7 @@
 import type { Project } from '@/data/projects'
 import { SkillBadge } from './SkillBadge'
 import { ExternalLink, Code, Sparkles } from 'lucide-react'
+import { AVATAR_BASE64 } from '@/lib/avatar'
 
 interface ProjectCardProps {
   project: Project
@@ -48,7 +49,7 @@ export function ProjectCard({ project, onClickModal }: ProjectCardProps) {
         className="p-6 border-2 border-dashed border-[#E8E5E0] rounded-xl opacity-60 transition-all hover:opacity-100 hover:-translate-y-1 hover:shadow-lg w-full text-center flex flex-col items-center justify-center min-h-[400px]"
       >
         <img
-          src="/assets/avatar.jpg"
+          src={`data:image/jpeg;base64,${AVATAR_BASE64}`}
           alt="Coming Soon"
           className="w-32 h-32 rounded-full mb-4 object-cover"
         />
