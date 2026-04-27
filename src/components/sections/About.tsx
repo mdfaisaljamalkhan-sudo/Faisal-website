@@ -1,4 +1,5 @@
 import { SectionWrapper } from '@/components/ui/SectionWrapper'
+import { AVATAR_BASE64 } from '@/lib/avatar'
 
 export function About() {
   return (
@@ -22,8 +23,12 @@ export function About() {
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-[#EEF3FD] to-[#F2F0EB] rounded-xl h-80 flex items-center justify-center border-2 border-dashed border-[#E8E5E0]">
-          <p className="text-[#A09AAB] text-center px-6">Coming soon: Photo or decorative element</p>
+        <div className="flex items-center justify-center">
+          <img
+            src={`data:image/jpeg;base64,${AVATAR_BASE64}`}
+            alt="Faisal"
+            className="w-72 h-72 rounded-2xl object-cover shadow-lg"
+          />
         </div>
       </div>
     </SectionWrapper>
