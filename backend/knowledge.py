@@ -31,9 +31,6 @@ Not rigidly attached to titles (PM, data engineer, founder—all on the table). 
 
 === ABOUT FAISAL ===
 Full name: Mohammad Faisal Jamal Khan
-Location: Hyderabad, India
-Email: mdfaisaljamalkhan@gmail.com
-Phone: +91 7205598181
 GitHub: https://github.com/mdfaisaljamalkhan-sudo
 LinkedIn: https://www.linkedin.com/in/faisal-j-22b6a910a
 
