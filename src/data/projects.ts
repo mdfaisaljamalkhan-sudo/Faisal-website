@@ -51,4 +51,11 @@ export const projects: Project[] = [
     status: 'research',
     featured: false,
   },
+  {
+    id: 'coming-soon-1',
+    title: 'Next Project',
+    description: 'Something interesting is in the works.',
+    stack: [],
+    status: 'coming-soon',
+  },
 ]

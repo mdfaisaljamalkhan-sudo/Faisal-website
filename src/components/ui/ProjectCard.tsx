@@ -45,12 +45,16 @@ export function ProjectCard({ project, onClickModal }: ProjectCardProps) {
     return (
       <button
         onClick={onClickModal}
-        className="p-6 border-2 border-dashed border-[#E8E5E0] rounded-xl opacity-60 text-center transition-all hover:opacity-100 hover:-translate-y-1 hover:shadow-lg w-full text-left"
+        className="p-6 border-2 border-dashed border-[#E8E5E0] rounded-xl opacity-60 transition-all hover:opacity-100 hover:-translate-y-1 hover:shadow-lg w-full text-center flex flex-col items-center justify-center min-h-[400px]"
       >
-        <Sparkles className="w-8 h-8 text-[#2D6BE4] mx-auto mb-4" />
+        <img
+          src="/src/assets/avatar.png"
+          alt="Coming Soon"
+          className="w-32 h-32 rounded-full mb-4 object-cover"
+        />
         <h3 className="text-lg font-semibold text-[#1A1A1A] mb-2">{project.title}</h3>
-        <p className="text-sm italic text-[#A09AAB]">{project.description}</p>
-        <div className="inline-block mt-4">
+        <p className="text-sm italic text-[#A09AAB] mb-4">{project.description}</p>
+        <div className="inline-block">
           <span className="text-xs font-medium text-[#2D6BE4] bg-[#EEF3FD] px-3 py-1 rounded-full">
             Coming Soon
           </span>
