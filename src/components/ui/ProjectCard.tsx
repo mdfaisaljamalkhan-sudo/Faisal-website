@@ -1,6 +1,6 @@
 import type { Project } from '@/data/projects'
 import { SkillBadge } from './SkillBadge'
-import { ExternalLink, Code, Sparkles } from 'lucide-react'
+import { ExternalLink, Code } from 'lucide-react'
 import { AVATAR_BASE64 } from '@/lib/avatar'
 
 interface ProjectCardProps {
