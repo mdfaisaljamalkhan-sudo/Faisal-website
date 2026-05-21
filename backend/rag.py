@@ -59,14 +59,14 @@ def chunk_knowledge() -> list[str]:
 def initialize_rag():
     """Initialize or verify RAG vector database."""
     try:
-        collection = chroma_client.get_collection(name="faisal_knowledge")
+        collection = chroma_client.get_collection(name="faisal_knowledge_v2")
         print(f"✓ RAG database loaded ({collection.count()} chunks)")
         return
     except Exception:
         pass
 
     print("Initializing RAG database...")
-    collection = chroma_client.create_collection(name="faisal_knowledge")
+    collection = chroma_client.create_collection(name="faisal_knowledge_v2")
     chunks = chunk_knowledge()
 
     ids = [f"chunk_{i}" for i in range(len(chunks))]
@@ -79,7 +79,7 @@ def initialize_rag():
 
 def retrieve_context(query: str, top_k: int = 3) -> str:
     """Retrieve relevant knowledge chunks for a query."""
-    collection = chroma_client.get_collection(name="faisal_knowledge")
+    collection = chroma_client.get_collection(name="faisal_knowledge_v2")
     query_embedding = embedder.encode(query).tolist()
 
     results = collection.query(query_embeddings=[query_embedding], n_results=top_k)

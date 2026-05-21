@@ -13,8 +13,8 @@ export interface Project {
 
 export const projects: Project[] = [
   {
-    id: 'subadash',
-    title: 'SubaDash',
+    id: 'vizify',
+    title: 'Vizify',
     description:
       'Full-stack document management and analytics dashboard with AI-powered insights, subscription billing, and real-time data visualization. Built for users who need to manage documents, visualize data, and leverage AI for intelligent analysis.',
     stack: [
@@ -31,8 +31,8 @@ export const projects: Project[] = [
       'Anthropic API',
     ],
     status: 'live',
-    repoUrl: 'https://github.com/yourusername/subadash',
-    liveUrl: 'https://subadash.example.com',
+    repoUrl: 'https://github.com/yourusername/vizify',
+    liveUrl: 'https://vizify.example.com',
     featured: true,
   },
   {

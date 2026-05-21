@@ -82,7 +82,7 @@ LinkedIn: https://www.linkedin.com/in/faisal-j-22b6a910a
    - Features 7 professional presentation slides with data visualizations, KPIs, and strategic recommendations
    - Demonstrated 2,558 people trained, 1,450 placed (70.5% placement rate)
 
-2. SubaDash (Full-Stack Dashboard) [Live Project]
+2. Vizify (Full-Stack Dashboard) [Live Project]
    Document management and analytics platform with AI-powered insights
    Stack: React 19, TypeScript, FastAPI, Tailwind CSS, Zustand, TanStack Query, Recharts, Framer Motion
    Additional: SQLAlchemy, PostgreSQL, Stripe (payments), Anthropic API
@@ -136,7 +136,7 @@ Q: Can you relocate?
 A: Yes, Faisal is flexible on location.
 
 Q: How experienced are you in React/FastAPI/etc?
-A: Faisal has built full-stack projects with these stacks (SubaDash is a good example). He's practical rather than
+A: Faisal has built full-stack projects with these stacks (Vizify is a good example). He's practical rather than
 academic — learns by building and leverages documentation and AI tools effectively.
 
 Q: What's your approach to AI/ML?
