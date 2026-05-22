@@ -87,16 +87,10 @@ async def chat(req: ChatRequest):
             messages=messages,
         )
         return {"reply": response.content[0].text}
-    except (anthropic.RateLimitError, anthropic.APIStatusError) as e:
-        status = getattr(e, "status_code", None)
-        if status not in (402, 429, 529):
-            print(f"ERROR: {type(e).__name__} {status}: {e}\n{traceback.format_exc()}")
-            raise HTTPException(status_code=500, detail="Something went wrong. Please try again.")
+    except Exception as anthropic_err:
+        print(f"Anthropic failed ({type(anthropic_err).__name__}), trying Groq fallback...")
         try:
             return {"reply": _groq_fallback(messages)}
         except Exception as groq_err:
-            print(f"Groq fallback failed: {groq_err}")
+            print(f"Groq fallback also failed: {groq_err}")
             raise HTTPException(status_code=503, detail="The chatbot is temporarily unavailable. You can reach Faisal directly at mdfaisaljamalkhan@gmail.com or on LinkedIn.")
-    except Exception as e:
-        print(f"ERROR: {type(e).__name__}: {e}\n{traceback.format_exc()}")
-        raise HTTPException(status_code=500, detail="Something went wrong. Please try again.")
