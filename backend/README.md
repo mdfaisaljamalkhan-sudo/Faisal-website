@@ -1,4 +1,14 @@
-# Faisal's RAG Chatbot Backend
+---
+title: Faisal Website Backend
+emoji: 🤖
+colorFrom: blue
+colorTo: green
+sdk: docker
+app_port: 7860
+pinned: false
+---
+
+# Faisal's Website Backend
 
 A **Retrieval-Augmented Generation (RAG)** chatbot built with FastAPI, ChromaDB, and Claude API. Answers recruiter questions about Faisal using semantic search over his personal knowledge base.
 
