@@ -6,6 +6,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from dotenv import load_dotenv
+import anthropic
 from anthropic import Anthropic
 
 from knowledge import FAISAL_KNOWLEDGE
@@ -75,6 +76,13 @@ async def chat(req: ChatRequest):
             messages=messages,
         )
         return {"reply": response.content[0].text}
+    except anthropic.RateLimitError:
+        raise HTTPException(status_code=503, detail="The chatbot is temporarily rate-limited. Please try again in a moment.")
+    except anthropic.APIStatusError as e:
+        if e.status_code in (402, 529):
+            raise HTTPException(status_code=503, detail="The chatbot is temporarily unavailable. You can reach Faisal directly at mdfaisaljamalkhan@gmail.com or on LinkedIn.")
+        print(f"ERROR: {type(e).__name__} {e.status_code}: {e}\n{traceback.format_exc()}")
+        raise HTTPException(status_code=500, detail="Something went wrong. Please try again.")
     except Exception as e:
         print(f"ERROR: {type(e).__name__}: {e}\n{traceback.format_exc()}")
         raise HTTPException(status_code=500, detail="Something went wrong. Please try again.")
