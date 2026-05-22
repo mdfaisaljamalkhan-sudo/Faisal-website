@@ -1,5 +1,4 @@
 import os
-import traceback
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException
@@ -64,6 +63,7 @@ def _groq_fallback(messages: list[dict]) -> str:
     response = client.chat.completions.create(
         model="llama-3.3-70b-versatile",
         max_tokens=1024,
+        timeout=30,
         messages=[{"role": "system", "content": SYSTEM_PROMPT}] + messages,
     )
     return response.choices[0].message.content
@@ -88,7 +88,10 @@ async def chat(req: ChatRequest):
             max_tokens=1024,
             system=SYSTEM_PROMPT,
             messages=messages,
+            timeout=30.0,
         )
+        if not response.content or not hasattr(response.content[0], 'text'):
+            raise ValueError("Unexpected response shape from Anthropic")
         return {"reply": response.content[0].text}
     except Exception as anthropic_err:
         print(f"Anthropic failed ({type(anthropic_err).__name__}), trying Groq fallback...")

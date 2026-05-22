@@ -17,9 +17,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application code
 COPY . .
 
-# Set environment for ChromaDB
-ENV CHROMA_DATA_DIR=/data/chroma_data
-
 # Expose port for HF Spaces
 EXPOSE 7860
 
