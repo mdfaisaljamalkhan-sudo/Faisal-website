@@ -36,7 +36,6 @@ app.add_middleware(
 )
 
 anthropic_client = Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
-groq_client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
 
 SYSTEM_PROMPT = f"""You are Faisal's AI assistant, representing him authentically to recruiters and visitors.
 Your role is to answer questions about Faisal's background, work style, thinking, and personality.
@@ -58,7 +57,11 @@ class ChatRequest(BaseModel):
 
 
 def _groq_fallback(messages: list[dict]) -> str:
-    response = groq_client.chat.completions.create(
+    groq_key = os.environ.get("GROQ_API_KEY")
+    if not groq_key:
+        raise RuntimeError("GROQ_API_KEY not configured")
+    client = Groq(api_key=groq_key)
+    response = client.chat.completions.create(
         model="llama-3.3-70b-versatile",
         max_tokens=1024,
         messages=[{"role": "system", "content": SYSTEM_PROMPT}] + messages,
