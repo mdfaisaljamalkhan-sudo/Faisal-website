@@ -8,6 +8,7 @@ from pydantic import BaseModel
 from dotenv import load_dotenv
 import anthropic
 from anthropic import Anthropic
+from groq import Groq
 
 from knowledge import FAISAL_KNOWLEDGE
 
@@ -34,7 +35,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-client = Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
+anthropic_client = Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
+groq_client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
 
 SYSTEM_PROMPT = f"""You are Faisal's AI assistant, representing him authentically to recruiters and visitors.
 Your role is to answer questions about Faisal's background, work style, thinking, and personality.
@@ -55,6 +57,15 @@ class ChatRequest(BaseModel):
     history: list[dict] = []
 
 
+def _groq_fallback(messages: list[dict]) -> str:
+    response = groq_client.chat.completions.create(
+        model="llama-3.3-70b-versatile",
+        max_tokens=1024,
+        messages=[{"role": "system", "content": SYSTEM_PROMPT}] + messages,
+    )
+    return response.choices[0].message.content
+
+
 @app.get("/api/health")
 async def health():
     return {"status": "ok"}
@@ -69,20 +80,23 @@ async def chat(req: ChatRequest):
     messages = trimmed_history + [{"role": "user", "content": req.message}]
 
     try:
-        response = client.messages.create(
+        response = anthropic_client.messages.create(
             model="claude-haiku-4-5-20251001",
             max_tokens=1024,
             system=SYSTEM_PROMPT,
             messages=messages,
         )
         return {"reply": response.content[0].text}
-    except anthropic.RateLimitError:
-        raise HTTPException(status_code=503, detail="The chatbot is temporarily rate-limited. Please try again in a moment.")
-    except anthropic.APIStatusError as e:
-        if e.status_code in (402, 529):
+    except (anthropic.RateLimitError, anthropic.APIStatusError) as e:
+        status = getattr(e, "status_code", None)
+        if status not in (402, 429, 529):
+            print(f"ERROR: {type(e).__name__} {status}: {e}\n{traceback.format_exc()}")
+            raise HTTPException(status_code=500, detail="Something went wrong. Please try again.")
+        try:
+            return {"reply": _groq_fallback(messages)}
+        except Exception as groq_err:
+            print(f"Groq fallback failed: {groq_err}")
             raise HTTPException(status_code=503, detail="The chatbot is temporarily unavailable. You can reach Faisal directly at mdfaisaljamalkhan@gmail.com or on LinkedIn.")
-        print(f"ERROR: {type(e).__name__} {e.status_code}: {e}\n{traceback.format_exc()}")
-        raise HTTPException(status_code=500, detail="Something went wrong. Please try again.")
     except Exception as e:
         print(f"ERROR: {type(e).__name__}: {e}\n{traceback.format_exc()}")
         raise HTTPException(status_code=500, detail="Something went wrong. Please try again.")
