@@ -8,14 +8,13 @@ from pydantic import BaseModel
 from dotenv import load_dotenv
 from anthropic import Anthropic
 
-from rag import retrieve_context, build_rag_prompt, initialize_rag
+from knowledge import FAISAL_KNOWLEDGE
 
 load_dotenv()
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    initialize_rag()
     yield
 
 
@@ -36,35 +35,18 @@ app.add_middleware(
 
 client = Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
 
-SYSTEM_PROMPT = """You are Faisal's AI assistant, representing him authentically to recruiters and visitors.
+SYSTEM_PROMPT = f"""You are Faisal's AI assistant, representing him authentically to recruiters and visitors.
 Your role is to answer questions about Faisal's background, work style, thinking, and personality.
 
-CORE INSTRUCTION: You have access to Faisal's personality profile and 30 curated Q&As below. Use these to:
-1. Answer direct questions by finding the most relevant Q&A
-2. Answer novel/similar questions by inferring from his personality profile and past answers
-3. Always stay true to his actual beliefs, values, and communication style — don't generalize or hallucinate
-
-KEY PERSONALITY TRAITS (reference these when answering):
-- High-standards, impatient for slow progress (acknowledged weakness)
-- Values learning, impact, and meaningful work over money
-- Believes work should grow the person; won't settle for redundant roles
-- Prefers trust + autonomy over micromanagement
-- Solves problems through empathy + root cause analysis
-- Data-driven decision maker; uses Pareto Principle for prioritization
-- Excellent at resolving conflicts by finding underlying interests
-- Listens before speaking; leads with evidence, not ego
-- Takes initiative without formal authority
-- Proactive learner in AI, data, and business problem-solving
-
-IMPORTANT: When answering questions not explicitly in the Q&A set:
-- Infer from his personality profile and stated values
-- Stay consistent with his communication style (direct, honest, self-aware)
-- Acknowledge if you're uncertain or if something is outside his shared experiences
-- Don't claim expertise he hasn't demonstrated
-- Mention relevant projects/experiences if they apply
+Use the knowledge base below to answer questions accurately. For questions not explicitly covered,
+infer from his personality profile and stated values while staying true to his communication style.
 
 TONE: Conversational, honest, direct. Brief by default (2-3 sentences) unless more detail is requested.
-Avoid generic advice; cite his actual thinking when possible."""
+Avoid generic advice; cite his actual thinking and experiences when possible.
+
+--- KNOWLEDGE BASE ---
+{FAISAL_KNOWLEDGE}
+"""
 
 
 class ChatRequest(BaseModel):
@@ -82,10 +64,8 @@ async def chat(req: ChatRequest):
     if not req.message.strip():
         raise HTTPException(status_code=400, detail="Message cannot be empty")
 
-    context = retrieve_context(req.message, top_k=3)
-    user_message_with_context = build_rag_prompt(req.message, context)
     trimmed_history = req.history[-10:]
-    messages = trimmed_history + [{"role": "user", "content": user_message_with_context}]
+    messages = trimmed_history + [{"role": "user", "content": req.message}]
 
     try:
         response = client.messages.create(
